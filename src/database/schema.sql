@@ -27,3 +27,17 @@ INSERT INTO posts (content, user_id) VALUES
     ('Suave na nave.', 3),
     ('Dormir em qlq lugar tem seus benefícios.', 4),
     ('Kevinino', 5);
+
+INSERT INTO users (name, email) VALUES
+    ('Fernanda Savelli', 'fernanda@gmail.com'),
+    ('Nathália Santos', 'nathalia@gmail.com'),
+    ('Sara Souza', 'sara@gmail.com'),
+    ('Samuel Braga', 'samuel@gmail.com'),
+    ('Luciana Savelli', 'luciana@gmail.com'),
+    ('Jorge Savelli', 'jorge@gmail'),
+    ('Nathan Ivani', 'nathan@gmail.com'),
+    ('Beatriz Ivani', 'beatriz@gmail.com'),
+    ('Simone Ivani', 'simone@gmail.com'),
+    ('Wagner Ivani', 'wagner@gmail.com'),
+    ('Maria Conceição', 'maria@gmail.com'),
+    ('Victor Nascimento', 'victor@gmail.com');
