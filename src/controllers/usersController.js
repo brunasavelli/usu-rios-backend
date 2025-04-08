@@ -1,50 +1,56 @@
-const User = require('../models/User');
-const UserList = require('../models/UserList');
+const userModel = require("../models/userModel");
 
-const lista = new UserList();
-
-lista.addUser(new User('Bruna Savelli', 'bnsavelli@gmail.com', 17));
-lista.addUser(new User('Alejandra', '4yob@gmail.com', 17));
-
-const router = {
-    getAllUsers: (req, res) => {
-        res.json(lista.getAllUsers());
-    },
-
-    getUserById: (req, res) => {
-        try {
-            res.json(lista.getUserById(req.params.id));
-        } catch (error) {
-            res.status(404).json({message: 'Erro ao buscar usuário por ID', error});
-        }
-    },
-
-    addUser: (req, res) => {
-        try {
-            const {name, email, age} = req.body;
-            if(!name || !email || !age) {
-                throw new Error('Todos os campos devem ser preenchidos');
-            }
-            const newUser = new User(name, email, age);
-            lista.addUser(newUser);
-            res.status(201).json({message: 'Usuário adicionado com sucesso', newUser});
-        } catch (error) {
-            res.status(400).json({message: 'Erro ao adicionar usuário', error});
-        }
-    },
-
-    updateUser: (req, res) => {
-        try {
-            res.json(lista.updateUser(req.params.id, req.body));
-        } catch (error) {
-            res.status(404).json({message: 'Erro ao atualizar usuário', error});
-        }
-    },
-
-    deleteUser: (req, res) => {
-        lista.deleteUser(req.params.id);
-        res.status(200).json({message: 'Usuário deletado com sucesso', IdDeletado: req.params.id});
+const getUsers = async (req, res) => {
+    try {
+        const users = await userModel.getUsers();
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao buscar usuários." });
     }
-}
+};
 
-module.exports = router;
+const getUserById = async (req, res) => {
+    try {
+        const user = await userModel.getUserById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: "Usuário não encontrado." });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao buscar usuário." });
+    }
+};
+
+const createUser = async (req, res) => {
+    try {
+        const { name, email } = req.body;
+        const newUser = await userModel.createUser(name, email);
+        res.status(201).json(newUser);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao criar usuário." });
+    }
+};
+
+const updateUser = async (req, res) => {
+    try {
+        const { name, email } = req.body;
+        const updatedUser = await userModel.updateUser(req.params.id, name, email);
+        if (!updatedUser) {
+            return res.status(404).json({ message: "Usuário não encontrado." });
+        }
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao atualizar usuário." });
+    }
+};
+
+const deleteUser = async (req, res) => {
+    try {
+        const message = await userModel.deleteUser(req.params.id);
+        res.json(message);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao deletar usuário." });
+    }
+};
+
+module.exports = { getUsers, getUserById, createUser, updateUser, deleteUser };

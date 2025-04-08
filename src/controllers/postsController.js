@@ -1,52 +1,56 @@
-const Post = require('../models/Post');
-const PostList = require('../models/PostList');
-const { post } = require('../routes/postRoutes');
+const postModel = require("../models/postModel");
 
-const lista = new PostList();
-
-lista.addPost(new Post('Bruna Savelli', 'Tarde no parque', 'https://weochoichoi.com'));
-lista.addPost(new Post('Alejandra', 'Sorvete com as amigas', 'https://weochoichoi.com'));
-
-const router = {
-    getAllPosts: (req, res) => {
-        res.json(lista.getAllPosts());
-    },
-
-    addPost: (req,res) =>{
-        try {
-            const {userName, legend, image} = req.body;
-            if(!userName || !legend || !image) {
-                throw new Error('Todos os campos devem ser preenchidos');
-            }
-            const newPost = new Post(userName,legend, image);
-            lista.addPost(newPost);
-            res.status(201).json('Postagem adicionada');
-        } catch (error) {
-            res.status(400).json({message: 'Erro ao fazer postagem', error});
-        }
-    },
-
-    getPostById: (req,res) => {
-        try {
-            const post = lista.getPostById(req.params.id);
-            res.status(200).json(post);
-        } catch (error) {
-            res.status(404).json({message: 'Erro ao buscar postagem', error});
-        }
-    },
-
-    updatePost: (req, res) => {
-        try {
-            res.json(lista.updatePost(req.params.id, req.body));
-        } catch (error) {
-            res.status(404).json({message: 'Erro ao atualizar postagem', error});
-        }
-    },
-
-    deletePost: (req, res) => {
-        lista.deletePost(req.params.id);
-        res.status(200).json({message: 'Postagem deletada', IdDeletado: req.params.id});
+const getPosts = async (req, res) => {
+    try {
+        const posts = await postModel.getPosts();
+        res.json(posts);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao buscar posts."});
     }
-}
+};
 
-module.exports = router;
+const getPostById = async (req, res) => {
+    try {
+        const post = await postModel.getPostById(req.params.id);
+        if (!post) {
+            return res.status(404).json({ message: "Post não encontrado." });
+        }
+        res.json(post);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao buscar post." });
+    }
+};
+
+const createPost = async (req, res) => {
+    try {
+        const { content, user_id } = req.body;
+        const newPost = await postModel.createPost({ content, user_id });
+        res.status(201).json(newPost);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao criar post." });
+    }
+};
+
+const updatePost = async (req, res) => {
+    try {
+        const { content, user_id } = req.body;
+        const updatedPost = await postModel.updatePost(req.params.id, { content, user_id });
+        if (!updatedPost) {
+            return res.status(404).json({ message: "Post não encontrado." });
+        }
+        res.json(updatedPost);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao atualizar post." });
+    }
+};
+
+const deletePost = async (req, res) => {
+    try {
+        const message = await postModel.deletePost(req.params.id);
+        res.json(message);
+    } catch (error) {
+        res.status(500).json({ message: "Erro ao deletar post." });
+    }
+};
+
+module.exports = { getPosts, getPostById, createPost, updatePost, deletePost };
