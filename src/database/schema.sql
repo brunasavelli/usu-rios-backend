@@ -8,6 +8,8 @@ CREATE TABLE users (
     email VARCHAR(100) UNIQUE NOT NULL
 );
 
+ALTER TABLE users ADD COLUMN photo TEXT;
+
 CREATE TABLE posts (
     id SERIAL PRIMARY KEY,
     content TEXT NOT NULL,
